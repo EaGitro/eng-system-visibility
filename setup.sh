@@ -1,4 +1,5 @@
 #! /bin/bash
-mkdir ./data
+
+[ ! -d "./data" ] && mkdir ./data
 
 

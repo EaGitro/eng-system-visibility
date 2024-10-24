@@ -23,12 +23,12 @@ def makeitconstant(srccls: Type[T]) -> T:
 @makeitconstant
 class pathes:
     data = "/data/"
-    suff = "data.jsonl"
+    suff = ".jsonl"
     prod = "product"
     test = "test"
-    visi = f"{data}visi-"
-    visitest = f"{visi}-{test}-{suff}"
-    visiprod = f"{visi}-{prod}-{suff}"
+    visi = f"{data}/visi/visi-"
+    visitest = f"{visi}-{test}-data-"
+    visiprod = f"{visi}-{prod}-data-"
 
 
 @app.route("/health")
@@ -36,19 +36,24 @@ def health():
     return "ok"
 
 
-
-@app.route("/visibility/post/<string:mode>", methods=["POST"])
-def visibility_post(mode):
-    if mode == "product":
-        datapath = pathes.visiprod
-    elif mode == "test":
-        datapath = pathes.visitest
-    else:
-        return {"error": {"type": "InvalidPath", "message": f"The path '/visibility/post/{mode}' is invalid. Valid paths are '/visibility/post/product' or '/visibility/post/test'"}}, 404
+@app.route("/visibility/post/<string:uid>", methods=["POST"])
+def visibility_post(uid):
+    if request.args.get("mode") == "test" :
+        datapath = pathes.visitest + uid + pathes.suff
+    if uid == "":
+        return {"error": {"type": "InvalidPath", "message": f"The path '/visibility/post/{uid}' is invalid."}}, 404
     
+    
+    datapath = pathes.visiprod + uid + pathes.suff
+
+
     req = request.json
     with open(datapath, mode="a", encoding="utf-8") as f:
         json.dump(req, f,  ensure_ascii=False)
         f.write("\n")
     
     return req
+
+
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=5050, debug=True)
