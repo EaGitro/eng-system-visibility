@@ -22,13 +22,17 @@ def makeitconstant(srccls: Type[T]) -> T:
 
 @makeitconstant
 class pathes:
-    data = "/data/"
+    data = "./data"
     suff = ".jsonl"
     prod = "product"
     test = "test"
-    visi = f"{data}/visi/visi-"
-    visitest = f"{visi}-{test}-data-"
-    visiprod = f"{visi}-{prod}-data-"
+    visidir = f"{data}/visi/"
+    visitestpref = f"visi-{test}-data-"
+    visipref = f"visi-{prod}-data-"
+
+    clickdir = f"{data}/click/"
+    clicktestpref = f"click-{test}-data-"
+    clickpref = f"click-{prod}-data-"
 
 
 @app.route("/health")
@@ -36,17 +40,42 @@ def health():
     return "ok"
 
 
-@app.route("/visibility/post/<string:uid>", methods=["POST"])
-def visibility_post(uid):
+@app.route("/post/visibility/<string:uid>", methods=["POST"])
+def post_visibility(uid):
     if request.args.get("mode") == "test" :
-        datapath = pathes.visitest + uid + pathes.suff
+        datadir = pathes.visidir + uid + "/"
+        datapath = datadir + pathes.visitestpref + uid + pathes.suff
     if uid == "":
-        return {"error": {"type": "InvalidPath", "message": f"The path '/visibility/post/{uid}' is invalid."}}, 404
+        return {"error": {"type": "InvalidPath", "message": f"The path '/post/visibility/{uid}' is invalid."}}, 404
     
+    datadir = pathes.visidir + uid + "/"
+    datapath = datadir + pathes.visipref + uid + pathes.suff
+
+    if not os.path.isdir(datadir):
+        os.makedirs(datadir)
+
+    req = request.json
+    with open(datapath, mode="a", encoding="utf-8") as f:
+        json.dump(req, f,  ensure_ascii=False)
+        f.write("\n")
     
-    datapath = pathes.visiprod + uid + pathes.suff
+    return req
 
 
+@app.route("/post/click/<string:uid>", methods=["POST"])
+def post_click(uid):
+    if request.args.get("mode") == "test" :
+        datadir = pathes.clickdir + uid + "/"
+        datapath = datadir + pathes.clicktestpref + uid + pathes.suff
+    if uid == "":
+        return {"error": {"type": "InvalidPath", "message": f"The path '/post/click/{uid}' is invalid."}}, 404
+    
+    
+    datadir = pathes.clickdir + uid + "/"
+    datapath = datadir + pathes.clickpref + uid + pathes.suff
+
+    if not os.path.isdir(datadir):
+        os.makedirs(datadir)
     req = request.json
     with open(datapath, mode="a", encoding="utf-8") as f:
         json.dump(req, f,  ensure_ascii=False)

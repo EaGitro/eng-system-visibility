@@ -18,3 +18,34 @@ WARNING: This is a development server. Do not use it in a production deployment.
 ```
 
 local server: `http://127.0.0.1:5050`
+
+
+## url 
+
+```env
+NEXT_PUBLIC_USER_WATCHING_URL="http://127.0.0.1:5050/"
+```
+
+## endpoints
+
+```
+/post/visibility/
+```
+
+
+```
+./
+|
++- health       # health point
+|
++- post/
+    |
+    +- visibility/
+    |   |
+    |   +- <uid>    # visibility point: POST
+    |
+    +- click/
+        |
+        +- <uid>    # click point: POST
+
+```
