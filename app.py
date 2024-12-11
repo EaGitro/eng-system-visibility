@@ -84,5 +84,32 @@ def post_click(uid):
     return req
 
 
+@makeitconstant
+class pathv2:
+    data = "./data"
+    suff = ".jsonl"
+    clickdir = f"{data}/click-v2/"
+    clickpref = f"click-v2-data-"
+
+
+
+@app.route("/post/click-v2/<string:uid>", methods=["POST"])
+def postv2_click(uid):
+    if uid == "":
+        return {"error": {"type": "InvalidPath", "message": f"The path '/post/click/{uid}' is invalid."}}, 404
+    
+    
+    datadir = pathv2.clickdir + uid + "/"
+    datapath = datadir + pathv2.clickpref + uid + pathv2.suff
+    if not os.path.isdir(datadir):
+        os.makedirs(datadir)
+    req = request.json
+    with open(datapath, mode="a", encoding="utf-8") as f:
+        json.dump(req, f,  ensure_ascii=False)
+        f.write("\n")
+    
+    return req
+
+
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5050, debug=True)
